@@ -1,0 +1,14 @@
+﻿[
+  {
+    "outputFile": "Views/Home/Index.js",
+    "inputFile": "Views/Home/Index.jsx"
+  },
+  {
+    "outputFile": "Views/Home/Privacy.js",
+    "inputFile": "Views/Home/Privacy.jsx"
+  },
+  {
+    "outputFile": "Views/Home/Counter.js",
+    "inputFile": "Views/Home/Counter.jsx"
+  }
+]

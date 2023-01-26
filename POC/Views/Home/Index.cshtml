@@ -1,0 +1,7 @@
+﻿@using RG.SSR;
+@inject ServerSideRenderer SSR
+@{
+    ViewData["Title"] = "Home Page";
+}
+
+@SSR.RenderReact("Index", isStatic: true)

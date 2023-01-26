@@ -1,0 +1,14 @@
+{
+  "version": "1.0",
+  "defaultProvider": "cdnjs",
+  "libraries": [
+    {
+      "library": "react@18.2.0",
+      "destination": "wwwroot/lib/react"
+    },
+    {
+      "library": "react-dom@18.2.0",
+      "destination": "wwwroot/lib/react-dom"
+    }
+  ]
+}

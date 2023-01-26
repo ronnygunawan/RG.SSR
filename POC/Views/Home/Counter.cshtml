@@ -1,0 +1,10 @@
+﻿@using RG.SSR
+@inject ServerSideRenderer SSR
+@{
+    ViewData["Title"] = "Counter";
+}
+
+<script src="~/lib/react/umd/react.production.min.js"></script>
+<script src="~/lib/react-dom/umd/react-dom.production.min.js"></script>
+
+@SSR.RenderReact("Counter")
