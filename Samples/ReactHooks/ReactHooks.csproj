@@ -1,0 +1,26 @@
+<Project Sdk="Microsoft.NET.Sdk.Web">
+
+	<PropertyGroup>
+		<TargetFramework>net7.0</TargetFramework>
+		<Nullable>enable</Nullable>
+		<ImplicitUsings>enable</ImplicitUsings>
+		<UserSecretsId>c8420d54-dc75-45c1-8570-5b10a757f352</UserSecretsId>
+		<DockerDefaultTargetOS>Linux</DockerDefaultTargetOS>
+	</PropertyGroup>
+
+	<ItemGroup>
+		<None Include="compilerconfig.json" />
+		<EmbeddedResource Include="Views/**/*.min.js" />
+		<EmbeddedResource Include="wwwroot/lib/**/*.min.js" />
+	</ItemGroup>
+
+	<ItemGroup>
+		<PackageReference Include="BuildWebCompiler2022" Version="1.14.10" />
+		<PackageReference Include="Microsoft.VisualStudio.Azure.Containers.Tools.Targets" Version="1.17.0" />
+	</ItemGroup>
+
+	<ItemGroup>
+		<ProjectReference Include="..\..\RG.SSR\RG.SSR.csproj" />
+	</ItemGroup>
+
+</Project>

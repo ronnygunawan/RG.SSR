@@ -1,0 +1,7 @@
+﻿@using RG.SSR
+@inject ServerSideRenderer SSR
+@{
+    ViewData["Title"] = "Counter";
+}
+
+@SSR.RenderPreact("Counter")

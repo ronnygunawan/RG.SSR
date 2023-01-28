@@ -1,6 +1,7 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
 using RG.SSR.JavaScript;
 using RG.SSR.Options;
+using RG.SSR.Preact;
 using RG.SSR.React;
 
 namespace RG.SSR
@@ -10,8 +11,10 @@ namespace RG.SSR
         public static IServiceCollection AddServerSideRendering(this IServiceCollection services, Action<ServerSideRendererOptions>? configureOptions = null)
         {
             services.AddOptions<ServerSideRendererOptions>();
+            services.AddSingleton<ModuleLoader>();
             services.AddScoped<JavaScriptEngine>();
-            services.AddScoped<IReactRenderer, ReactRenderer>();
+            services.AddTransient<IReactRenderer, ReactRenderer>();
+            services.AddTransient<IPreactRenderer, PreactRenderer>();
             services.AddTransient<ServerSideRenderer>();
 
             if (configureOptions is not null)

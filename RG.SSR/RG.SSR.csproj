@@ -1,24 +1,25 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
-  <PropertyGroup>
-    <TargetFramework>net7.0</TargetFramework>
-    <ImplicitUsings>enable</ImplicitUsings>
-    <Nullable>enable</Nullable>
-  </PropertyGroup>
+	<PropertyGroup>
+		<TargetFramework>net7.0</TargetFramework>
+		<ImplicitUsings>enable</ImplicitUsings>
+		<Nullable>enable</Nullable>
+	</PropertyGroup>
 
-  <ItemGroup>
-    <None Remove="React\Scripts\ReactSSR.js" />
-  </ItemGroup>
+	<ItemGroup>
+		<None Remove="React\Scripts\ReactSSR.js" />
+	</ItemGroup>
 
-  <ItemGroup>
-    <EmbeddedResource Include="React\Scripts\ReactSSR.js" />
-  </ItemGroup>
+	<ItemGroup>
+		<EmbeddedResource Include="React\Scripts\ReactSSR.js" />
+		<EmbeddedResource Include="Preact\Scripts\PreactSSR.js" />
+	</ItemGroup>
 
-  <ItemGroup>
-    <PackageReference Include="Microsoft.AspNetCore.Html.Abstractions" Version="2.2.0" />
-    <PackageReference Include="Microsoft.ClearScript" Version="7.3.7" />
-    <PackageReference Include="Microsoft.Extensions.DependencyInjection.Abstractions" Version="7.0.0" />
-    <PackageReference Include="Microsoft.Extensions.Options" Version="7.0.0" />
-  </ItemGroup>
+	<ItemGroup>
+		<PackageReference Include="Microsoft.AspNetCore.Html.Abstractions" Version="2.2.0" />
+		<PackageReference Include="Microsoft.ClearScript" Version="7.3.7" />
+		<PackageReference Include="Microsoft.Extensions.DependencyInjection.Abstractions" Version="7.0.0" />
+		<PackageReference Include="Microsoft.Extensions.Options" Version="7.0.0" />
+	</ItemGroup>
 
 </Project>
