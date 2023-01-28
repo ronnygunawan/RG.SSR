@@ -50,5 +50,17 @@ namespace RG.SSR
                 )
             );
         }
+
+        public HtmlString RenderPreact<TProps>(string componentName, TProps props, bool isStatic = false)
+        {
+            return new HtmlString(
+                value: _preactRenderer.Render(
+                    componentAssembly: Assembly.GetCallingAssembly(),
+                    componentName,
+                    props,
+                    isStatic
+                )
+            );
+        }
     }
 }
