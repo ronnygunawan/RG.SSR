@@ -1,0 +1,10 @@
+{
+  "version": "1.0",
+  "defaultProvider": "cdnjs",
+  "libraries": [
+    {
+      "library": "preact@10.11.3",
+      "destination": "wwwroot/lib/preact"
+    }
+  ]
+}

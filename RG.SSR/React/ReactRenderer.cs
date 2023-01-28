@@ -90,16 +90,16 @@ namespace RG.SSR.React
 
         public string Render(Assembly componentAssembly, string componentName, bool isStatic)
         {
-            string resourceName = $"{componentAssembly.FullName}.{componentName}";
+            string resourceKey = $"{componentAssembly.FullName}.{componentName}";
 
             string componentScript = _componentCache.GetOrAdd(
-                key: resourceName,
-                valueFactory: name =>
+                key: resourceKey,
+                valueFactory: key =>
                 {
                     using Stream stream = EmbeddedResourceResolver.ResolveJavaScriptResourceStream(
                         assembly: componentAssembly,
                         resourceName: componentName
-                    ) ?? throw new FileNotFoundException($"The resource '{componentName}' was not found in the assembly '{componentAssembly.FullName}'.", resourceName);
+                    ) ?? throw new FileNotFoundException($"The resource '{componentName}' was not found in the assembly '{componentAssembly.FullName}'.", resourceKey);
                     using StreamReader reader = new(stream);
                     return reader.ReadToEnd();
                 });
@@ -150,16 +150,16 @@ namespace RG.SSR.React
 
         public string Render<TProps>(Assembly componentAssembly, string componentName, TProps props, bool isStatic)
         {
-            string resourceName = $"{componentAssembly.FullName}.{componentName}";
+            string resourceKey = $"{componentAssembly.FullName}.{componentName}";
 
             string componentScript = _componentCache.GetOrAdd(
-                key: resourceName,
-                valueFactory: name =>
+                key: resourceKey,
+                valueFactory: key =>
                 {
                     using Stream stream = EmbeddedResourceResolver.ResolveJavaScriptResourceStream(
                         assembly: componentAssembly,
                         resourceName: componentName
-                    ) ?? throw new FileNotFoundException($"The resource '{componentName}' was not found in the assembly '{componentAssembly.FullName}'.", resourceName);
+                    ) ?? throw new FileNotFoundException($"The resource '{componentName}' was not found in the assembly '{componentAssembly.FullName}'.", resourceKey);
                     using StreamReader reader = new(stream);
                     return reader.ReadToEnd();
                 });
