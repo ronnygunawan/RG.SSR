@@ -1,0 +1,10 @@
+@using RG.SSR;
+@inject ServerSideRenderer SSR
+@{
+    ViewData["Title"] = "Home Page";
+}
+
+@SSR.RenderSolidjs(
+    componentName: "Index",
+    isStatic: true
+)

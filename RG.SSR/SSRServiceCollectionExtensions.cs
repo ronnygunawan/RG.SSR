@@ -3,6 +3,7 @@ using RG.SSR.JavaScript;
 using RG.SSR.Options;
 using RG.SSR.Preact;
 using RG.SSR.React;
+using RG.SSR.Solidjs;
 
 namespace RG.SSR
 {
@@ -15,6 +16,7 @@ namespace RG.SSR
             services.AddScoped<JavaScriptEngine>();
             services.AddTransient<IReactRenderer, ReactRenderer>();
             services.AddTransient<IPreactRenderer, PreactRenderer>();
+            services.AddTransient<ISolidjsRenderer, SolidjsRenderer>();
             services.AddTransient<ServerSideRenderer>();
 
             if (configureOptions is not null)

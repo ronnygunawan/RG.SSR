@@ -11,6 +11,8 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ReactHooks", "Samples\React
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Preact", "Samples\Preact\Preact.csproj", "{FD98764A-E285-4F29-9AC8-189494D47FB5}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Solidjs", "Samples\Solidjs\Solidjs.csproj", "{3E8A5F2B-D123-4C56-A789-1B2C3D4E5F6A}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -29,6 +31,10 @@ Global
 		{FD98764A-E285-4F29-9AC8-189494D47FB5}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{FD98764A-E285-4F29-9AC8-189494D47FB5}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{FD98764A-E285-4F29-9AC8-189494D47FB5}.Release|Any CPU.Build.0 = Release|Any CPU
+		{3E8A5F2B-D123-4C56-A789-1B2C3D4E5F6A}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{3E8A5F2B-D123-4C56-A789-1B2C3D4E5F6A}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{3E8A5F2B-D123-4C56-A789-1B2C3D4E5F6A}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{3E8A5F2B-D123-4C56-A789-1B2C3D4E5F6A}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -36,6 +42,7 @@ Global
 	GlobalSection(NestedProjects) = preSolution
 		{EC84A673-C16F-4E94-867C-4DC4B5E036FD} = {30438356-013B-4AD0-9A4E-ABB5D8FA19D6}
 		{FD98764A-E285-4F29-9AC8-189494D47FB5} = {30438356-013B-4AD0-9A4E-ABB5D8FA19D6}
+		{3E8A5F2B-D123-4C56-A789-1B2C3D4E5F6A} = {30438356-013B-4AD0-9A4E-ABB5D8FA19D6}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {1CF7B8B7-A22E-4189-8905-53C82B3CD0F3}

@@ -13,6 +13,7 @@
 	<ItemGroup>
 		<EmbeddedResource Include="React\Scripts\ReactSSR.js" />
 		<EmbeddedResource Include="Preact\Scripts\PreactSSR.js" />
+		<EmbeddedResource Include="Solidjs\Scripts\SolidjsSSR.js" />
 	</ItemGroup>
 
 	<ItemGroup>

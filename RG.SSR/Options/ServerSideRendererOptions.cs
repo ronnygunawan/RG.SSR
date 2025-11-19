@@ -4,5 +4,6 @@
     {
         public ReactOptions React { get; } = new();
         public PreactOptions Preact { get; } = new();
+        public SolidjsOptions Solidjs { get; } = new();
     }
 }

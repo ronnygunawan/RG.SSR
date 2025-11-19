@@ -1,0 +1,13 @@
+@using RG.SSR;
+@inject ServerSideRenderer SSR
+@{
+    ViewData["Title"] = "Privacy Policy";
+}
+
+@SSR.RenderSolidjs(
+    componentName: "Privacy",
+    props: new {
+        Title = ViewData["Title"]
+    },
+    isStatic: true
+)
