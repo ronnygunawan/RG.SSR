@@ -1,0 +1,10 @@
+{
+  "version": "1.0",
+  "defaultProvider": "cdnjs",
+  "libraries": [
+    {
+      "library": "solid-js@1.8.7",
+      "destination": "wwwroot/lib/solid-js"
+    }
+  ]
+}
