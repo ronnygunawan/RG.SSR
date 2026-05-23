@@ -131,15 +131,15 @@ public class MockImplementationProperties : IDisposable
             (string initialState) =>
             {
                 // Evaluate a module that imports useState and tests it
-                var moduleCode = $@"
-import {{ useState }} from 'preact/hooks';
-const result = useState({initialState});
+                var moduleCode = $$"""
+import { useState } from 'preact/hooks';
+const result = useState({{initialState}});
 const isArray = Array.isArray(result);
 const hasLength2 = result.length === 2;
 const firstElement = JSON.stringify(result[0]);
 const secondIsFunction = typeof result[1] === 'function';
-JSON.stringify({{ isArray, hasLength2, firstElement, secondIsFunction }});
-";
+JSON.stringify({ isArray, hasLength2, firstElement, secondIsFunction });
+""";
                 var result = _engine.Evaluate(
                     new DocumentInfo { Category = ModuleCategory.Standard },
                     moduleCode
@@ -178,14 +178,14 @@ JSON.stringify({{ isArray, hasLength2, firstElement, secondIsFunction }});
             ChildrenArbitrary(),
             (string tag, string props, string children) =>
             {
-                var moduleCode = $@"
-import {{ createElement }} from 'preact';
-const result = createElement('{tag}', {props}{children});
-const hasTag = result.tag === '{tag}';
-const hasProps = JSON.stringify(result.props) === JSON.stringify({props});
+                var moduleCode = $$"""
+import { createElement } from 'preact';
+const result = createElement('{{tag}}', {{props}}{{children}});
+const hasTag = result.tag === '{{tag}}';
+const hasProps = JSON.stringify(result.props) === JSON.stringify({{props}});
 const hasChildren = Array.isArray(result.children);
-JSON.stringify({{ hasTag, hasProps, hasChildren, tag: result.tag }});
-";
+JSON.stringify({ hasTag, hasProps, hasChildren, tag: result.tag });
+""";
                 var result = _engine.Evaluate(
                     new DocumentInfo { Category = ModuleCategory.Standard },
                     moduleCode
@@ -217,16 +217,16 @@ JSON.stringify({{ hasTag, hasProps, hasChildren, tag: result.tag }});
             FactoryResultArbitrary(),
             (string factoryResult) =>
             {
-                var moduleCode = $@"
-import {{ useMemo }} from 'preact/hooks';
-function factory() {{ return {factoryResult}; }}
+                var moduleCode = $$"""
+import { useMemo } from 'preact/hooks';
+function factory() { return {{factoryResult}}; }
 const result = useMemo(factory);
 const expected = factory();
 const resultJson = JSON.stringify(result);
 const expectedJson = JSON.stringify(expected);
 const areEqual = resultJson === expectedJson;
-JSON.stringify({{ resultJson, expectedJson, areEqual }});
-";
+JSON.stringify({ resultJson, expectedJson, areEqual });
+""";
                 var result = _engine.Evaluate(
                     new DocumentInfo { Category = ModuleCategory.Standard },
                     moduleCode
@@ -257,16 +257,16 @@ JSON.stringify({{ resultJson, expectedJson, areEqual }});
             FactoryResultArbitrary(),
             (string returnValue) =>
             {
-                var moduleCode = $@"
-import {{ useCallback }} from 'preact/hooks';
-const myCallback = () => {returnValue};
+                var moduleCode = $$"""
+import { useCallback } from 'preact/hooks';
+const myCallback = () => {{returnValue}};
 const result = useCallback(myCallback);
 const isSameReference = result === myCallback;
 const callResult = result();
 const expectedResult = myCallback();
 const sameOutput = JSON.stringify(callResult) === JSON.stringify(expectedResult);
-JSON.stringify({{ isSameReference, sameOutput }});
-";
+JSON.stringify({ isSameReference, sameOutput });
+""";
                 var result = _engine.Evaluate(
                     new DocumentInfo { Category = ModuleCategory.Standard },
                     moduleCode

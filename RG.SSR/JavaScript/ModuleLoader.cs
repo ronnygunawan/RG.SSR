@@ -13,7 +13,7 @@ namespace RG.SSR.JavaScript
         private Assembly? _currentComponentAssembly;
         private readonly object _assemblyContextLock = new();
 
-        private const string PreactModuleSource = @"
+        private const string PreactModuleSource = """
 const noop = () => {};
 export function createElement(tag, props, ...children) { return { tag, props, children }; }
 export function useState(initialState) { return [initialState, noop]; }
@@ -23,9 +23,9 @@ export function useReducer(reducer, initialState) { return [initialState, noop];
 export function useCallback(callback) { return callback; }
 export function useMemo(factory) { return factory(); }
 export function useRef(initialValue) { return { current: initialValue }; }
-";
+""";
 
-        private const string PreactHooksModuleSource = @"
+        private const string PreactHooksModuleSource = """
 const noop = () => {};
 export function useState(initialState) { return [initialState, noop]; }
 export function useEffect() {}
@@ -34,9 +34,9 @@ export function useCallback(callback) { return callback; }
 export function useMemo(factory) { return factory(); }
 export function useRef(initialValue) { return { current: initialValue }; }
 export function useContext() { return undefined; }
-";
+""";
 
-        private const string ReactModuleSource = @"
+        private const string ReactModuleSource = """
 const noop = () => {};
 export function createElement(tag, props, ...children) { return { tag, props, children }; }
 export function useState(initialState) { return [initialState, noop]; }
@@ -46,7 +46,7 @@ export function useReducer(reducer, initialState) { return [initialState, noop];
 export function useCallback(callback) { return callback; }
 export function useMemo(factory) { return factory(); }
 export function useRef(initialValue) { return { current: initialValue }; }
-";
+""";
 
         public ModuleLoader()
         {

@@ -1,7 +1,7 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
 	<PropertyGroup>
-		<TargetFramework>net8.0</TargetFramework>
+		<TargetFramework>net10.0</TargetFramework>
 		<ImplicitUsings>enable</ImplicitUsings>
 		<Nullable>enable</Nullable>
 		<IsPackable>false</IsPackable>
@@ -15,6 +15,7 @@
 		<PackageReference Include="FsCheck" Version="2.16.6" />
 		<PackageReference Include="FsCheck.Xunit" Version="2.16.6" />
 		<PackageReference Include="Microsoft.Extensions.Options" Version="8.0.0" />
+		<PackageReference Include="Shouldly" Version="4.3.0" />
 	</ItemGroup>
 
 	<ItemGroup>

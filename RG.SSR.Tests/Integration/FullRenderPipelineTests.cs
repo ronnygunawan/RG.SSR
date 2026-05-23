@@ -3,6 +3,7 @@ using RG.SSR.JavaScript;
 using RG.SSR.Options;
 using RG.SSR.React;
 using RG.SSR.Preact;
+using Shouldly;
 using System.Reflection;
 using System.Text;
 using Xunit;
@@ -98,27 +99,27 @@ public class FullRenderPipelineTests
         string uniqueId = NextUniqueId();
 
         // The component is an ES module that imports from 'utility'
-        string componentScript = @"
+        string componentScript = """
 import { createElement } from 'react';
 import { greet } from 'utility';
 
 export default function Greeting() {
     return createElement('span', null, greet('World'));
 }
-";
+""";
 
-        string utilityModule = @"
+        string utilityModule = """
 import { getPrefix } from 'helper';
 export function greet(name) {
     return getPrefix() + ', ' + name + '!';
 }
-";
+""";
 
-        string helperModule = @"
+        string helperModule = """
 export function getPrefix() {
     return 'Hello';
 }
-";
+""";
 
         var resources = new Dictionary<string, byte[]>
         {
@@ -137,8 +138,8 @@ export function getPrefix() {
             string output = renderer.Render(assembly, "Greeting", isStatic: true);
 
             // Assert: The 3-level chain resolved and rendered correctly
-            Assert.Contains("Hello, World!", output);
-            Assert.Contains("<span", output);
+            output.ShouldContain("Hello, World!");
+            output.ShouldContain("<span");
         }
     }
 
@@ -150,26 +151,26 @@ export function getPrefix() {
 
         string uniqueId = NextUniqueId();
 
-        string componentScript = @"
+        string componentScript = """
 import { createElement } from 'react';
 import { formatMessage } from 'formatter';
 
 export default function MessageDisplay(props) {
     return createElement('div', null, formatMessage(props.name));
 }
-";
+""";
 
-        string formatterModule = @"
+        string formatterModule = """
 import { PREFIX, SUFFIX } from 'constants';
 export function formatMessage(name) {
     return PREFIX + name + SUFFIX;
 }
-";
+""";
 
-        string constantsModule = @"
+        string constantsModule = """
 export const PREFIX = 'Welcome, ';
 export const SUFFIX = '!';
-";
+""";
 
         var resources = new Dictionary<string, byte[]>
         {
@@ -187,8 +188,8 @@ export const SUFFIX = '!';
             string output = renderer.Render(assembly, "MessageDisplay", new { Name = "Alice" }, isStatic: true);
 
             // Assert
-            Assert.Contains("Welcome, Alice!", output);
-            Assert.Contains("<div", output);
+            output.ShouldContain("Welcome, Alice!");
+            output.ShouldContain("<div");
         }
     }
 
@@ -198,25 +199,25 @@ export const SUFFIX = '!';
         // Arrange: Component → utility → helper (3 levels) through Preact renderer
         string uniqueId = NextUniqueId();
 
-        string componentScript = @"
+        string componentScript = """
 export function Greeting() {
     return createElement('p', null, buildGreeting('World'));
 }
 import { buildGreeting } from 'greeter';
-";
+""";
 
-        string greeterModule = @"
+        string greeterModule = """
 import { exclaim } from 'punctuation';
 export function buildGreeting(name) {
     return 'Hi, ' + name + exclaim();
 }
-";
+""";
 
-        string punctuationModule = @"
+        string punctuationModule = """
 export function exclaim() {
     return '!!!';
 }
-";
+""";
 
         var resources = new Dictionary<string, byte[]>
         {
@@ -234,8 +235,8 @@ export function exclaim() {
             string output = renderer.Render(assembly, "Greeting", isStatic: true);
 
             // Assert
-            Assert.Contains("Hi, World!!!", output);
-            Assert.Contains("<p", output);
+            output.ShouldContain("Hi, World!!!");
+            output.ShouldContain("<p");
         }
     }
 
@@ -262,8 +263,8 @@ export function exclaim() {
             string output = renderer.Render(assembly, "SimpleCard", isStatic: true);
 
             // Assert: Plain script renders correctly
-            Assert.Contains("<div", output);
-            Assert.Contains("Hello Plain", output);
+            output.ShouldContain("<div");
+            output.ShouldContain("Hello Plain");
         }
     }
 
@@ -288,8 +289,8 @@ export function exclaim() {
             string output = renderer.Render(assembly, "Greeter", new { Name = "Bob" }, isStatic: true);
 
             // Assert
-            Assert.Contains("<h1", output);
-            Assert.Contains("Hello, Bob", output);
+            output.ShouldContain("<h1");
+            output.ShouldContain("Hello, Bob");
         }
     }
 
@@ -314,8 +315,8 @@ export function exclaim() {
             string output = renderer.Render(assembly, "InfoBox", isStatic: true);
 
             // Assert
-            Assert.Contains("<section", output);
-            Assert.Contains("Info content", output);
+            output.ShouldContain("<section");
+            output.ShouldContain("Info content");
         }
     }
 
@@ -330,12 +331,12 @@ export function exclaim() {
         string moduleUniqueId = NextUniqueId();
 
         string plainScript = "function TestComp() { return { tag: 'div', props: null, children: ['Same Output'] }; }";
-        string moduleScript = @"
+        string moduleScript = """
 import { createElement } from 'react';
 export default function TestComp() {
     return { tag: 'div', props: null, children: ['Same Output'] };
 }
-";
+""";
 
         var plainResources = new Dictionary<string, byte[]>
         {
@@ -367,7 +368,7 @@ export default function TestComp() {
         }
 
         // Assert: Both produce the same HTML content
-        Assert.Equal(plainOutput, moduleOutput);
+        plainOutput.ShouldBe(moduleOutput);
     }
 
     // ===== Test 3: Option classes retain default values (backward compatibility) =====
@@ -379,8 +380,8 @@ export default function TestComp() {
         var options = new ServerSideRendererOptions();
 
         // Assert: React and Preact sub-options are initialized
-        Assert.NotNull(options.React);
-        Assert.NotNull(options.Preact);
+        options.React.ShouldNotBeNull();
+        options.Preact.ShouldNotBeNull();
     }
 
     [Fact]
@@ -390,9 +391,9 @@ export default function TestComp() {
         var options = new ReactOptions();
 
         // Assert: All properties have their expected default values
-        Assert.Equal("umd.react.production.min.js", options.ReactLibraryResourceName);
-        Assert.Equal("umd.react-dom.production.min.js", options.ReactDomLibraryResourceName);
-        Assert.True(options.InlineLibrary);
+        options.ReactLibraryResourceName.ShouldBe("umd.react.production.min.js");
+        options.ReactDomLibraryResourceName.ShouldBe("umd.react-dom.production.min.js");
+        options.InlineLibrary.ShouldBeTrue();
     }
 
     [Fact]
@@ -402,11 +403,11 @@ export default function TestComp() {
         var options = new PreactOptions();
 
         // Assert: All properties have their expected default values
-        Assert.Equal("preact.umd.min.js", options.PreactUmdLibraryResourceName);
-        Assert.Equal("preact.hooks.umd.min.js", options.PreactHooksUmdLibraryResourceName);
-        Assert.Equal("preact.compat.umd.min.js", options.PreactCompatUmdLibraryResourceName);
-        Assert.True(options.InlineLibrary);
-        Assert.False(options.ReactCompat);
+        options.PreactUmdLibraryResourceName.ShouldBe("preact.umd.min.js");
+        options.PreactHooksUmdLibraryResourceName.ShouldBe("preact.hooks.umd.min.js");
+        options.PreactCompatUmdLibraryResourceName.ShouldBe("preact.compat.umd.min.js");
+        options.InlineLibrary.ShouldBeTrue();
+        options.ReactCompat.ShouldBeFalse();
     }
 
     [Fact]
@@ -421,9 +422,9 @@ export default function TestComp() {
         };
 
         // Assert
-        Assert.Equal("custom-react.js", options.ReactLibraryResourceName);
-        Assert.Equal("custom-react-dom.js", options.ReactDomLibraryResourceName);
-        Assert.False(options.InlineLibrary);
+        options.ReactLibraryResourceName.ShouldBe("custom-react.js");
+        options.ReactDomLibraryResourceName.ShouldBe("custom-react-dom.js");
+        options.InlineLibrary.ShouldBeFalse();
     }
 
     [Fact]
@@ -440,11 +441,11 @@ export default function TestComp() {
         };
 
         // Assert
-        Assert.Equal("custom-preact.js", options.PreactUmdLibraryResourceName);
-        Assert.Equal("custom-hooks.js", options.PreactHooksUmdLibraryResourceName);
-        Assert.Equal("custom-compat.js", options.PreactCompatUmdLibraryResourceName);
-        Assert.False(options.InlineLibrary);
-        Assert.True(options.ReactCompat);
+        options.PreactUmdLibraryResourceName.ShouldBe("custom-preact.js");
+        options.PreactHooksUmdLibraryResourceName.ShouldBe("custom-hooks.js");
+        options.PreactCompatUmdLibraryResourceName.ShouldBe("custom-compat.js");
+        options.InlineLibrary.ShouldBeFalse();
+        options.ReactCompat.ShouldBeTrue();
     }
 
     [Fact]
@@ -454,9 +455,9 @@ export default function TestComp() {
         var options = new ServerSideRendererOptions();
 
         // The React property should be of type ReactOptions
-        Assert.IsType<ReactOptions>(options.React);
+        options.React.ShouldBeOfType<ReactOptions>();
 
         // The Preact property should be of type PreactOptions
-        Assert.IsType<PreactOptions>(options.Preact);
+        options.Preact.ShouldBeOfType<PreactOptions>();
     }
 }

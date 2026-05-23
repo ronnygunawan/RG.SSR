@@ -2,6 +2,11 @@
 @inject ServerSideRenderer SSR
 @{
     ViewData["Title"] = "ES Module Demo";
+    var props = new
+    {
+        Name = "Developer",
+        Features = new[] { "ES modules", "transitive imports", "framework mocks" }
+    };
 }
 
 <div class="text-center">
@@ -16,7 +21,7 @@
     and utility functions from a shared <code>'./formatting.js'</code> module.
 </p>
 
-@SSR.RenderReact("Greeting", new { Name = "Developer", Features = new[] { "ES modules", "transitive imports", "framework mocks" } }, isStatic: true)
+@SSR.RenderReact("Greeting", props, isStatic: true)
 
 <hr class="my-4" />
 
