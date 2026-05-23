@@ -174,10 +174,12 @@ export function useRef(initialValue) { return { current: initialValue }; }
                 if (assembly != null)
                 {
                     string filename = Path.GetFileName(specifier);
-                    // Strip .js extension for resource resolution if present
-                    string resourceName = filename.EndsWith(".js", StringComparison.OrdinalIgnoreCase)
-                        ? filename[..^3]
-                        : filename;
+                    // Strip known JavaScript extensions for resource resolution if present
+                    string resourceName = filename.EndsWith(".min.js", StringComparison.OrdinalIgnoreCase)
+                        ? filename[..^7]
+                        : filename.EndsWith(".js", StringComparison.OrdinalIgnoreCase)
+                            ? filename[..^3]
+                            : filename;
 
                     Stream? resourceStream = EmbeddedResourceResolver.ResolveJavaScriptResourceStream(assembly, resourceName);
                     if (resourceStream != null)
