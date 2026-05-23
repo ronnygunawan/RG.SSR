@@ -17,7 +17,7 @@ namespace RG.SSR.JavaScript
 
         // Pattern to match import statements: import followed by whitespace, {, ", or '
         private static readonly Regex ImportPattern = new(
-            @"\bimport\s+|import\s*[{""']",
+            @"\bimport\b\s*(?:[{""']|\s)",
             RegexOptions.Compiled
         );
 

@@ -128,7 +128,7 @@ public class HydrationOutputProperties
     private static MockAssembly CreatePreactEsModuleAssembly(string componentName, string tag, string text)
     {
         string uniqueId = NextUniqueId();
-        string script = $"export function {componentName}() {{ return createElement('{tag}', null, '{text}'); }}";
+        string script = $"import {{ createElement }} from 'preact';\nexport function {componentName}() {{ return createElement('{tag}', null, '{text}'); }}";
         var resources = new Dictionary<string, byte[]>
         {
             [$"MockAssembly_{uniqueId}.{componentName}.js"] = Encoding.UTF8.GetBytes(script)
@@ -142,7 +142,6 @@ public class HydrationOutputProperties
     /// </summary>
     private static (ReactRenderer renderer, JavaScriptEngine engine) CreateReactRenderer()
     {
-        ResetReactSsrModuleRegistered();
         var moduleLoader = new ModuleLoader();
         var engine = new JavaScriptEngine(moduleLoader);
         var ssrOptions = new ServerSideRendererOptions();
@@ -168,17 +167,6 @@ public class HydrationOutputProperties
         return (renderer, engine);
     }
 
-    /// <summary>
-    /// Resets the static _ssrModuleRegistered flag in ReactRenderer via reflection.
-    /// This is necessary because each test iteration creates a new ModuleLoader,
-    /// but the static flag prevents re-registration of the SSR module.
-    /// </summary>
-    private static void ResetReactSsrModuleRegistered()
-    {
-        var field = typeof(ReactRenderer).GetField("_ssrModuleRegistered", BindingFlags.NonPublic | BindingFlags.Static);
-        field?.SetValue(null, false);
-    }
-
     // ===== Property 7: Hydration Script Tag Type =====
 
     /// <summary>
@@ -194,7 +182,6 @@ public class HydrationOutputProperties
             TextContentArbitrary(),
             (string componentName, string tag, string text) =>
             {
-                ResetReactSsrModuleRegistered();
                 var assembly = CreateReactEsModuleAssembly(componentName, tag, text);
                 var (renderer, engine) = CreateReactRenderer();
                 using (engine)

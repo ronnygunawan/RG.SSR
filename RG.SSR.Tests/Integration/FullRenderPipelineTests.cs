@@ -52,20 +52,8 @@ public class FullRenderPipelineTests
     private static int _counter;
     private static string NextUniqueId() => Interlocked.Increment(ref _counter).ToString();
 
-    /// <summary>
-    /// Resets the static _ssrModuleRegistered flag in ReactRenderer via reflection.
-    /// This is necessary because each test creates a new ModuleLoader,
-    /// but the static flag prevents re-registration of the SSR module.
-    /// </summary>
-    private static void ResetReactSsrModuleRegistered()
-    {
-        var field = typeof(ReactRenderer).GetField("_ssrModuleRegistered", BindingFlags.NonPublic | BindingFlags.Static);
-        field?.SetValue(null, false);
-    }
-
     private static (ReactRenderer renderer, ModuleLoader moduleLoader, JavaScriptEngine engine) CreateReactRenderer()
     {
-        ResetReactSsrModuleRegistered();
         var moduleLoader = new ModuleLoader();
         var engine = new JavaScriptEngine(moduleLoader);
         var ssrOptions = new ServerSideRendererOptions();
@@ -96,7 +84,6 @@ public class FullRenderPipelineTests
         // Helper provides a greeting prefix
         // Utility uses helper to build a full greeting
         // Component uses utility to render a greeting element
-        ResetReactSsrModuleRegistered();
 
         string uniqueId = NextUniqueId();
 
@@ -149,8 +136,6 @@ public class FullRenderPipelineTests
     public void ReactRenderer_ThreeLevelDependencyGraph_WithProps_ResolvesAndRendersCorrectly()
     {
         // Arrange: Component → formatter → constants (3 levels with props)
-        ResetReactSsrModuleRegistered();
-
         string uniqueId = NextUniqueId();
 
         string componentScript = """
@@ -202,10 +187,12 @@ public class FullRenderPipelineTests
         string uniqueId = NextUniqueId();
 
         string componentScript = """
+            import { createElement } from 'preact';
+            import { buildGreeting } from 'greeter';
+
             export function Greeting() {
                 return createElement('p', null, buildGreeting('World'));
             }
-            import { buildGreeting } from 'greeter';
             """;
 
         string greeterModule = """
@@ -327,8 +314,6 @@ public class FullRenderPipelineTests
     {
         // Arrange: Same component logic, one as plain script, one as ES module
         // Both should produce the same rendered HTML content
-        ResetReactSsrModuleRegistered();
-
         string plainUniqueId = NextUniqueId();
         string moduleUniqueId = NextUniqueId();
 
@@ -361,7 +346,6 @@ public class FullRenderPipelineTests
         }
 
         // Render ES module
-        ResetReactSsrModuleRegistered();
         var (moduleRenderer, _, moduleEngine) = CreateReactRenderer();
         string moduleOutput;
         using (moduleEngine)

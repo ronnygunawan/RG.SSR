@@ -14,8 +14,6 @@ namespace RG.SSR.React
         private static readonly object _reactScriptLock = new();
         private static string? _reactSsrScript;
         private static readonly object _reactSsrScriptLock = new();
-        private static bool _ssrModuleRegistered;
-        private static readonly object _ssrModuleRegisteredLock = new();
         private static readonly ConcurrentDictionary<string, string> _componentCache = new();
 
         private const string SsrModuleSpecifier = "react-ssr";
@@ -99,20 +97,10 @@ namespace RG.SSR.React
 
         private void EnsureSsrModuleRegistered()
         {
-            if (!_ssrModuleRegistered)
-            {
-                lock (_ssrModuleRegisteredLock)
-                {
-                    if (!_ssrModuleRegistered)
-                    {
-                        string ssrScript = GetSsrScript();
-                        // Convert the SSR script to an ES module that exports the render function
-                        string ssrModuleSource = ssrScript + "\nexport { render };";
-                        _moduleLoader.RegisterModule(SsrModuleSpecifier, ssrModuleSource);
-                        _ssrModuleRegistered = true;
-                    }
-                }
-            }
+            string ssrScript = GetSsrScript();
+            // Convert the SSR script to an ES module that exports the render function
+            string ssrModuleSource = ssrScript + "\nexport { render };";
+            _moduleLoader.RegisterModule(SsrModuleSpecifier, ssrModuleSource);
         }
 
         public string Render(Assembly componentAssembly, string componentName, bool isStatic)

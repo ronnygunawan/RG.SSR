@@ -4,7 +4,6 @@ using RG.SSR.EmbeddedResources;
 using RG.SSR.JavaScript;
 using RG.SSR.Options;
 using System.Collections.Concurrent;
-using System.Net.NetworkInformation;
 using System.Reflection;
 using System.Text.Json;
 
@@ -129,19 +128,16 @@ namespace RG.SSR.Preact
             if (isModule)
             {
                 string ssrScript = GetSsrScript();
+                string componentModuleSpecifier = $"./{componentName}.js";
                 string wrapperModule = $$"""
-                    import { createElement, useState, useEffect, useContext, useReducer, useCallback, useMemo, useRef } from 'preact';
-
+                    import * as ComponentModule from '{{componentModuleSpecifier}}';
                     const render = (() => {
                         {{ssrScript}}
                         return render;
                     })();
-
-                    {{componentScript}}
-
-                    let Component = typeof {{componentName}} !== 'undefined' ? {{componentName}} : null;
+                    const Component = ComponentModule.default || ComponentModule['{{componentName}}'];
                     if (!Component) {
-                        throw new Error("No valid component export was found for '{{componentName}}'.");
+                        throw new Error('No valid component export was found for "{{componentName}}". The module must have a default export or a named export matching "{{componentName}}".');
                     }
                     const vdom = Component();
                     const result = render(vdom);
@@ -174,16 +170,27 @@ namespace RG.SSR.Preact
 
             if (isModule)
             {
+                string componentModuleSpecifier = $"./{componentName}.js";
+                string hydrationPrefix = "";
+                if (_optionsAccessor.Value.Preact.InlineLibrary && !_preactScriptRendered)
+                {
+                    _preactScriptRendered = true;
+                    hydrationPrefix = $"""<script defer>{GetPreactScript(componentAssembly)}const React=preact;</script>""";
+                }
+
                 return $"""
+                    {hydrationPrefix}
                     <div id="{id}">{renderedComponent}</div>
                     <script type="module">
-                    {componentScript}
-                    preact.hydrate(preact.createElement({componentName}, null), document.getElementById("{id}"));
+                    import * as ComponentModule from '{componentModuleSpecifier}';
+                    const Component = ComponentModule.default || ComponentModule['{componentName}'];
+                    if (!Component) throw new Error('No valid component export was found for "{componentName}". The module must have a default export or a named export matching "{componentName}".');
+                    preact.hydrate(preact.createElement(Component, null), document.getElementById("{id}"));
                     </script>
                     """;
             }
 
-            if (_optionsAccessor.Value.React.InlineLibrary && !_preactScriptRendered)
+            if (_optionsAccessor.Value.Preact.InlineLibrary && !_preactScriptRendered)
             {
                 _preactScriptRendered = true;
 
@@ -233,19 +240,16 @@ namespace RG.SSR.Preact
             if (isModule)
             {
                 string ssrScript = GetSsrScript();
+                string componentModuleSpecifier = $"./{componentName}.js";
                 string wrapperModule = $$"""
-                    import { createElement, useState, useEffect, useContext, useReducer, useCallback, useMemo, useRef } from 'preact';
-
+                    import * as ComponentModule from '{{componentModuleSpecifier}}';
                     const render = (() => {
                         {{ssrScript}}
                         return render;
                     })();
-
-                    {{componentScript}}
-
-                    let Component = typeof {{componentName}} !== 'undefined' ? {{componentName}} : null;
+                    const Component = ComponentModule.default || ComponentModule['{{componentName}}'];
                     if (!Component) {
-                        throw new Error("No valid component export was found for '{{componentName}}'.");
+                        throw new Error('No valid component export was found for "{{componentName}}". The module must have a default export or a named export matching "{{componentName}}".');
                     }
                     const props = {{propsJson}};
                     const vdom = Component(props);
@@ -280,16 +284,27 @@ namespace RG.SSR.Preact
 
             if (isModule)
             {
+                string componentModuleSpecifier = $"./{componentName}.js";
+                string hydrationPrefix = "";
+                if (_optionsAccessor.Value.Preact.InlineLibrary && !_preactScriptRendered)
+                {
+                    _preactScriptRendered = true;
+                    hydrationPrefix = $"""<script defer>{GetPreactScript(componentAssembly)}const React=preact;</script>""";
+                }
+
                 return $"""
+                    {hydrationPrefix}
                     <div id="{id}">{renderedComponent}</div>
                     <script type="module">
-                    {componentScript}
-                    preact.hydrate(preact.createElement({componentName}, {propsJson}), document.getElementById("{id}"));
+                    import * as ComponentModule from '{componentModuleSpecifier}';
+                    const Component = ComponentModule.default || ComponentModule['{componentName}'];
+                    if (!Component) throw new Error('No valid component export was found for "{componentName}". The module must have a default export or a named export matching "{componentName}".');
+                    preact.hydrate(preact.createElement(Component, {propsJson}), document.getElementById("{id}"));
                     </script>
                     """;
             }
 
-            if (_optionsAccessor.Value.React.InlineLibrary && !_preactScriptRendered)
+            if (_optionsAccessor.Value.Preact.InlineLibrary && !_preactScriptRendered)
             {
                 _preactScriptRendered = true;
 

@@ -10,8 +10,7 @@ namespace RG.SSR.JavaScript
     {
         private readonly ConcurrentDictionary<string, Document> _moduleByName = new();
         private readonly ConcurrentDictionary<string, Document> _customModules = new();
-        private Assembly? _currentComponentAssembly;
-        private readonly object _assemblyContextLock = new();
+        private static readonly AsyncLocal<Assembly?> _currentComponentAssembly = new();
 
         private const string PreactModuleSource = """
 const noop = () => {};
@@ -122,18 +121,12 @@ export function useRef(initialValue) { return { current: initialValue }; }
 
         public void SetComponentAssembly(Assembly assembly)
         {
-            lock (_assemblyContextLock)
-            {
-                _currentComponentAssembly = assembly;
-            }
+            _currentComponentAssembly.Value = assembly;
         }
 
         public void ClearComponentAssembly()
         {
-            lock (_assemblyContextLock)
-            {
-                _currentComponentAssembly = null;
-            }
+            _currentComponentAssembly.Value = null;
         }
 
         public override async Task<Document> LoadDocumentAsync(
@@ -166,10 +159,7 @@ export function useRef(initialValue) { return { current: initialValue }; }
             if (specifier.StartsWith("./") || specifier.StartsWith("../"))
             {
                 Assembly? assembly;
-                lock (_assemblyContextLock)
-                {
-                    assembly = _currentComponentAssembly;
-                }
+                assembly = _currentComponentAssembly.Value;
 
                 if (assembly != null)
                 {
@@ -211,14 +201,11 @@ export function useRef(initialValue) { return { current: initialValue }; }
                     contextCallback
                 );
             }
-            catch
+            catch (Exception ex) when (ex is FileNotFoundException || ex is UnauthorizedAccessException)
             {
                 // 5. If default also fails, throw FileNotFoundException
                 Assembly? assembly;
-                lock (_assemblyContextLock)
-                {
-                    assembly = _currentComponentAssembly;
-                }
+                assembly = _currentComponentAssembly.Value;
 
                 string assemblyName = assembly?.FullName ?? "unknown";
                 throw new FileNotFoundException(

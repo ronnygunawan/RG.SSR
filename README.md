@@ -89,6 +89,7 @@ export default function Greeting(props) {
 
 - `isStatic: true` — renders the component on the server and emits only HTML. No JavaScript is sent to the client. Use this for content that doesn't need interactivity.
 - `isStatic: false` (default) — renders on the server, then emits a hydration script so the component becomes interactive in the browser.
+- For ES module components with `isStatic: false`, the generated hydration script imports `./{ComponentName}.js` in the browser. Ensure that module is publicly served at that URL.
 
 ## ES Module Resolution
 
