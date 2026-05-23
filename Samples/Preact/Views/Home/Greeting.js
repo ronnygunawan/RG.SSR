@@ -1,6 +1,6 @@
 // ES Module component - demonstrates import/export syntax with RG.SSR
 import { createElement } from 'preact';
-import { formatGreeting, formatList } from './formatting.js';
+import { formatGreeting, formatList } from './Shared/formatting.js';
 
 export default function Greeting(props) {
     const greeting = formatGreeting(props.name);

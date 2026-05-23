@@ -1,7 +1,7 @@
 // ES Module component - demonstrates import/export syntax with RG.SSR
 // JSX source version (compiled to Greeting.js for module evaluation)
 import { createElement } from 'react';
-import { formatGreeting, formatList } from './formatting.js';
+import { formatGreeting, formatList } from './Shared/formatting.js';
 
 export default function Greeting(props) {
     const greeting = formatGreeting(props.name);

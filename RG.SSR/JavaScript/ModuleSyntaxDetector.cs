@@ -21,9 +21,9 @@ namespace RG.SSR.JavaScript
             RegexOptions.Compiled
         );
 
-        // Pattern to match export statements: export followed by whitespace then default, function, class, const, let, var, or {
+        // Pattern to match export statements: export followed by default/function/class/const/let/var, {, or *
         private static readonly Regex ExportPattern = new(
-            @"\bexport\s+(default|function|class|const|let|var)\b|\bexport\s*\{",
+            @"\bexport\s+(default|function|class|const|let|var)\b|\bexport\s*\{|\bexport\s*\*",
             RegexOptions.Compiled
         );
 

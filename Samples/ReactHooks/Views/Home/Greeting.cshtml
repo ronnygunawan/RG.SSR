@@ -18,7 +18,7 @@
 <p>
     The component below is written using <code>import</code>/<code>export</code> syntax.
     It imports <code>createElement</code> from the <code>'react'</code> framework module
-    and utility functions from a shared <code>'./formatting.js'</code> module.
+    and utility functions from a shared <code>'./Shared/formatting.js'</code> module.
 </p>
 
 @SSR.RenderReact("Greeting", props, isStatic: true)
@@ -30,7 +30,7 @@
     <div class="col-md-6">
         <h5>Component (Greeting.js)</h5>
         <pre><code>import { createElement } from 'react';
-import { formatGreeting, formatList } from './formatting.js';
+import { formatGreeting, formatList } from './Shared/formatting.js';
 
 export default function Greeting(props) {
     const greeting = formatGreeting(props.name);

@@ -246,7 +246,7 @@ namespace RG.SSR.React
         {
             EnsureSsrModuleRegistered();
 
-            // Register the component script as a module so the wrapper can import it
+            // Use the component module specifier for wrapper imports and hydration output
             string componentModuleSpecifier = $"./{componentName}.js";
 
             // Construct a wrapper module that imports the SSR render function and the component,

@@ -69,7 +69,9 @@ public class ModuleSyntaxDetectorProperties
             GenIdentifier().Select(id => $"export let {id} = true;"),
             GenIdentifier().Select(id => $"export var {id} = 123;"),
             GenIdentifier().Select(id => $"export class {id} {{}}"),
-            GenIdentifier().Select(id => $"export {{ {id} }};")
+            GenIdentifier().Select(id => $"export {{ {id} }};"),
+            Gen.Constant("export * from './module.js';"),
+            GenIdentifier().Select(id => $"export * as {id} from './module.js';")
         );
     }
 

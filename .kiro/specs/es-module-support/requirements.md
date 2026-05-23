@@ -110,7 +110,7 @@ This document specifies the requirements for adding ES module (ESM) support to t
 1. IF a Module_Specifier references a file that does not exist as an Embedded_Resource, THEN THE Module_Loader SHALL throw a FileNotFoundException with a message containing the Module_Specifier value and the full name of the assembly that was searched
 2. IF a Component_Module has a syntax error in an `import` statement, THEN THE JavaScript_Engine SHALL throw an exception with the 1-based line number where the error occurred and a description of the syntax violation
 3. IF a circular dependency is detected between modules, THEN THE JavaScript_Engine SHALL resolve the circular reference according to ES module specification semantics, making already-evaluated exports available and leaving not-yet-evaluated exports as undefined, without throwing an exception
-4. IF the Module_Loader fails to resolve a Module_Specifier that is not registered as an Embedded_Resource and the fallback document loader also cannot resolve it, THEN THE Module_Loader SHALL throw an exception with a message containing the unresolved Module_Specifier and the list of available resource names in the searched assembly
+4. IF the Module_Loader fails to resolve a Module_Specifier that is not registered as an Embedded_Resource and the fallback document loader also cannot resolve it, THEN THE Module_Loader SHALL throw a FileNotFoundException with a message containing the unresolved Module_Specifier and the full name of the searched assembly
 
 ### Requirement 9: All Scripts as Embedded Resources
 

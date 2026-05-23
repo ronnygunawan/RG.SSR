@@ -6,7 +6,7 @@ using System.Reflection;
 
 namespace RG.SSR.JavaScript
 {
-    internal sealed class ModuleLoader : DocumentLoader
+    public sealed class ModuleLoader : DocumentLoader
     {
         private readonly ConcurrentDictionary<string, Document> _moduleByName = new();
         private readonly ConcurrentDictionary<string, Document> _customModules = new();
