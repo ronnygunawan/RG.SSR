@@ -100,26 +100,26 @@ public class FullRenderPipelineTests
 
         // The component is an ES module that imports from 'utility'
         string componentScript = """
-import { createElement } from 'react';
-import { greet } from 'utility';
+            import { createElement } from 'react';
+            import { greet } from 'utility';
 
-export default function Greeting() {
-    return createElement('span', null, greet('World'));
-}
-""";
+            export default function Greeting() {
+                return createElement('span', null, greet('World'));
+            }
+            """;
 
         string utilityModule = """
-import { getPrefix } from 'helper';
-export function greet(name) {
-    return getPrefix() + ', ' + name + '!';
-}
-""";
+            import { getPrefix } from 'helper';
+            export function greet(name) {
+                return getPrefix() + ', ' + name + '!';
+            }
+            """;
 
         string helperModule = """
-export function getPrefix() {
-    return 'Hello';
-}
-""";
+            export function getPrefix() {
+                return 'Hello';
+            }
+            """;
 
         var resources = new Dictionary<string, byte[]>
         {
@@ -152,25 +152,25 @@ export function getPrefix() {
         string uniqueId = NextUniqueId();
 
         string componentScript = """
-import { createElement } from 'react';
-import { formatMessage } from 'formatter';
+            import { createElement } from 'react';
+            import { formatMessage } from 'formatter';
 
-export default function MessageDisplay(props) {
-    return createElement('div', null, formatMessage(props.name));
-}
-""";
+            export default function MessageDisplay(props) {
+                return createElement('div', null, formatMessage(props.name));
+            }
+            """;
 
         string formatterModule = """
-import { PREFIX, SUFFIX } from 'constants';
-export function formatMessage(name) {
-    return PREFIX + name + SUFFIX;
-}
-""";
+            import { PREFIX, SUFFIX } from 'constants';
+            export function formatMessage(name) {
+                return PREFIX + name + SUFFIX;
+            }
+            """;
 
         string constantsModule = """
-export const PREFIX = 'Welcome, ';
-export const SUFFIX = '!';
-""";
+            export const PREFIX = 'Welcome, ';
+            export const SUFFIX = '!';
+            """;
 
         var resources = new Dictionary<string, byte[]>
         {
@@ -200,24 +200,24 @@ export const SUFFIX = '!';
         string uniqueId = NextUniqueId();
 
         string componentScript = """
-export function Greeting() {
-    return createElement('p', null, buildGreeting('World'));
-}
-import { buildGreeting } from 'greeter';
-""";
+            export function Greeting() {
+                return createElement('p', null, buildGreeting('World'));
+            }
+            import { buildGreeting } from 'greeter';
+            """;
 
         string greeterModule = """
-import { exclaim } from 'punctuation';
-export function buildGreeting(name) {
-    return 'Hi, ' + name + exclaim();
-}
-""";
+            import { exclaim } from 'punctuation';
+            export function buildGreeting(name) {
+                return 'Hi, ' + name + exclaim();
+            }
+            """;
 
         string punctuationModule = """
-export function exclaim() {
-    return '!!!';
-}
-""";
+            export function exclaim() {
+                return '!!!';
+            }
+            """;
 
         var resources = new Dictionary<string, byte[]>
         {
@@ -332,11 +332,11 @@ export function exclaim() {
 
         string plainScript = "function TestComp() { return { tag: 'div', props: null, children: ['Same Output'] }; }";
         string moduleScript = """
-import { createElement } from 'react';
-export default function TestComp() {
-    return { tag: 'div', props: null, children: ['Same Output'] };
-}
-""";
+            import { createElement } from 'react';
+            export default function TestComp() {
+                return { tag: 'div', props: null, children: ['Same Output'] };
+            }
+            """;
 
         var plainResources = new Dictionary<string, byte[]>
         {

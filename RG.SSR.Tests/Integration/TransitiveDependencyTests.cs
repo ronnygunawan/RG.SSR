@@ -26,25 +26,25 @@ public class TransitiveDependencyTests : IDisposable
         // Arrange: 3-level dependency chain: Component → Utility → Helper
         // Helper exports a function that returns a greeting prefix
         string helperModule = """
-export function getPrefix() {
-    return 'Hello';
-}
-""";
+            export function getPrefix() {
+                return 'Hello';
+            }
+            """;
 
         // Utility imports Helper and builds a full greeting
         string utilityModule = """
-import { getPrefix } from 'helper';
-export function greet(name) {
-    return getPrefix() + ', ' + name + '!';
-}
-""";
+            import { getPrefix } from 'helper';
+            export function greet(name) {
+                return getPrefix() + ', ' + name + '!';
+            }
+            """;
 
         // Component imports Utility and uses it to produce output
         string componentModule = """
-import { greet } from 'utility';
-const message = greet('World');
-message;
-""";
+            import { greet } from 'utility';
+            const message = greet('World');
+            message;
+            """;
 
         _moduleLoader.RegisterModule("helper", helperModule);
         _moduleLoader.RegisterModule("utility", utilityModule);
@@ -62,23 +62,23 @@ message;
     {
         // Arrange: Helper exports configuration data
         string helperModule = """
-export const config = { separator: ' - ', suffix: '!!!' };
-""";
+            export const config = { separator: ' - ', suffix: '!!!' };
+            """;
 
         // Utility imports Helper config and uses it to format
         string utilityModule = """
-import { config } from 'helper';
-export function format(a, b) {
-    return a + config.separator + b + config.suffix;
-}
-""";
+            import { config } from 'helper';
+            export function format(a, b) {
+                return a + config.separator + b + config.suffix;
+            }
+            """;
 
         // Component imports Utility
         string componentModule = """
-import { format } from 'utility';
-const result = format('Left', 'Right');
-result;
-""";
+            import { format } from 'utility';
+            const result = format('Left', 'Right');
+            result;
+            """;
 
         _moduleLoader.RegisterModule("helper", helperModule);
         _moduleLoader.RegisterModule("utility", utilityModule);
@@ -95,29 +95,29 @@ result;
     {
         // Arrange: 4-level chain: Component → Service → Utility → Constants
         string constantsModule = """
-export const GREETING = 'Hi';
-export const PUNCTUATION = '!';
-""";
+            export const GREETING = 'Hi';
+            export const PUNCTUATION = '!';
+            """;
 
         string utilityModule = """
-import { GREETING, PUNCTUATION } from 'constants';
-export function buildMessage(name) {
-    return GREETING + ' ' + name + PUNCTUATION;
-}
-""";
+            import { GREETING, PUNCTUATION } from 'constants';
+            export function buildMessage(name) {
+                return GREETING + ' ' + name + PUNCTUATION;
+            }
+            """;
 
         string serviceModule = """
-import { buildMessage } from 'utility';
-export function getWelcome(user) {
-    return 'Welcome: ' + buildMessage(user);
-}
-""";
+            import { buildMessage } from 'utility';
+            export function getWelcome(user) {
+                return 'Welcome: ' + buildMessage(user);
+            }
+            """;
 
         string componentModule = """
-import { getWelcome } from 'service';
-const output = getWelcome('Alice');
-output;
-""";
+            import { getWelcome } from 'service';
+            const output = getWelcome('Alice');
+            output;
+            """;
 
         _moduleLoader.RegisterModule("constants", constantsModule);
         _moduleLoader.RegisterModule("utility", utilityModule);
@@ -137,31 +137,31 @@ output;
         // Per ES module spec, circular references resolve without infinite loops.
         // Already-evaluated exports are available; not-yet-evaluated exports are undefined.
         string moduleA = """
-import { getB } from 'moduleB';
-export function getA() {
-    return 'A';
-}
-export function getAB() {
-    return getA() + getB();
-}
-""";
+            import { getB } from 'moduleB';
+            export function getA() {
+                return 'A';
+            }
+            export function getAB() {
+                return getA() + getB();
+            }
+            """;
 
         string moduleB = """
-import { getA } from 'moduleA';
-export function getB() {
-    return 'B';
-}
-export function getBA() {
-    return getB() + (typeof getA === 'function' ? getA() : '?');
-}
-""";
+            import { getA } from 'moduleA';
+            export function getB() {
+                return 'B';
+            }
+            export function getBA() {
+                return getB() + (typeof getA === 'function' ? getA() : '?');
+            }
+            """;
 
         string componentModule = """
-import { getB } from 'moduleB';
-import { getA } from 'moduleA';
-const result = getA() + getB();
-result;
-""";
+            import { getB } from 'moduleB';
+            import { getA } from 'moduleA';
+            const result = getA() + getB();
+            result;
+            """;
 
         _moduleLoader.RegisterModule("moduleA", moduleA);
         _moduleLoader.RegisterModule("moduleB", moduleB);
@@ -181,19 +181,19 @@ result;
         // chain that uses the assembly context (via relative specifiers or registered modules)
         // all resolves within a single RenderModule call.
         string baseModule = """
-export function base() { return 'base'; }
-""";
+            export function base() { return 'base'; }
+            """;
 
         string midModule = """
-import { base } from 'baseModule';
-export function mid() { return base() + '-mid'; }
-""";
+            import { base } from 'baseModule';
+            export function mid() { return base() + '-mid'; }
+            """;
 
         string topModule = """
-import { mid } from 'midModule';
-const result = mid() + '-top';
-result;
-""";
+            import { mid } from 'midModule';
+            const result = mid() + '-top';
+            result;
+            """;
 
         _moduleLoader.RegisterModule("baseModule", baseModule);
         _moduleLoader.RegisterModule("midModule", midModule);
@@ -211,18 +211,18 @@ result;
         // Arrange: Component → Utility → Framework (react)
         // Utility uses createElement from react
         string utilityModule = """
-import { createElement } from 'react';
-export function createDiv(text) {
-    return createElement('div', null, text);
-}
-""";
+            import { createElement } from 'react';
+            export function createDiv(text) {
+                return createElement('div', null, text);
+            }
+            """;
 
         // Component imports utility and renders
         string componentModule = """
-import { createDiv } from 'utility';
-const vdom = createDiv('Hello');
-JSON.stringify(vdom);
-""";
+            import { createDiv } from 'utility';
+            const vdom = createDiv('Hello');
+            JSON.stringify(vdom);
+            """;
 
         _moduleLoader.RegisterModule("utility", utilityModule);
 
@@ -239,25 +239,25 @@ JSON.stringify(vdom);
     {
         // Arrange: Two modules import the same dependency - they should get the same instance
         string sharedModule = """
-export const sharedObject = { value: 42 };
-""";
+            export const sharedObject = { value: 42 };
+            """;
 
         string moduleA = """
-import { sharedObject } from 'shared';
-export function getFromA() { return sharedObject; }
-""";
+            import { sharedObject } from 'shared';
+            export function getFromA() { return sharedObject; }
+            """;
 
         string moduleB = """
-import { sharedObject } from 'shared';
-export function getFromB() { return sharedObject; }
-""";
+            import { sharedObject } from 'shared';
+            export function getFromB() { return sharedObject; }
+            """;
 
         string componentModule = """
-import { getFromA } from 'modA';
-import { getFromB } from 'modB';
-const same = getFromA() === getFromB();
-same.toString();
-""";
+            import { getFromA } from 'modA';
+            import { getFromB } from 'modB';
+            const same = getFromA() === getFromB();
+            same.toString();
+            """;
 
         _moduleLoader.RegisterModule("shared", sharedModule);
         _moduleLoader.RegisterModule("modA", moduleA);

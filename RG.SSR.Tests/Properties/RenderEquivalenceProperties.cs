@@ -100,23 +100,23 @@ public class RenderEquivalenceProperties
                 {
                     // Plain script: define component as a global function, evaluate with SSR script
                     string plainScript = $$"""
-{{_ssrScript}}
-function {{componentName}}() {
-    return { tag: '{{tag}}', props: null, children: ['{{text}}'] };
-}
-render({{componentName}}());
-""";
+                        {{_ssrScript}}
+                        function {{componentName}}() {
+                            return { tag: '{{tag}}', props: null, children: ['{{text}}'] };
+                        }
+                        render({{componentName}}());
+                        """;
                     string plainResult = engine.Evaluate(plainScript) as string ?? "";
 
                     // ES module: define component with export default, import render from SSR module
                     string moduleScript = $$"""
-import { render } from 'react-ssr';
-export default function {{componentName}}() {
-    return { tag: '{{tag}}', props: null, children: ['{{text}}'] };
-}
-const __result = render({{componentName}}());
-__result;
-""";
+                        import { render } from 'react-ssr';
+                        export default function {{componentName}}() {
+                            return { tag: '{{tag}}', props: null, children: ['{{text}}'] };
+                        }
+                        const __result = render({{componentName}}());
+                        __result;
+                        """;
                     string moduleResult = engine.Evaluate(
                         new DocumentInfo { Category = ModuleCategory.Standard },
                         moduleScript
@@ -180,23 +180,23 @@ __result;
 
                     // Plain script evaluation
                     string plainScript = $$"""
-{{_ssrScript}}
-function {{componentName}}(p) {
-    {{componentBody}}
-}
-render({{invocation}});
-""";
+                        {{_ssrScript}}
+                        function {{componentName}}(p) {
+                            {{componentBody}}
+                        }
+                        render({{invocation}});
+                        """;
                     string plainResult = engine.Evaluate(plainScript) as string ?? "";
 
                     // ES module evaluation
                     string moduleScript = $$"""
-import { render } from 'react-ssr';
-export default function {{componentName}}(p) {
-    {{componentBody}}
-}
-const __result = render({{invocation}});
-__result;
-""";
+                        import { render } from 'react-ssr';
+                        export default function {{componentName}}(p) {
+                            {{componentBody}}
+                        }
+                        const __result = render({{invocation}});
+                        __result;
+                        """;
                     string moduleResult = engine.Evaluate(
                         new DocumentInfo { Category = ModuleCategory.Standard },
                         moduleScript
@@ -243,23 +243,23 @@ __result;
 
                     // Plain script evaluation
                     string plainScript = $$"""
-{{_ssrScript}}
-function {{componentName}}() {
-    {{componentBody}}
-}
-render({{componentName}}());
-""";
+                        {{_ssrScript}}
+                        function {{componentName}}() {
+                            {{componentBody}}
+                        }
+                        render({{componentName}}());
+                        """;
                     string plainResult = engine.Evaluate(plainScript) as string ?? "";
 
                     // ES module evaluation
                     string moduleScript = $$"""
-import { render } from 'react-ssr';
-export default function {{componentName}}() {
-    {{componentBody}}
-}
-const __result = render({{componentName}}());
-__result;
-""";
+                        import { render } from 'react-ssr';
+                        export default function {{componentName}}() {
+                            {{componentBody}}
+                        }
+                        const __result = render({{componentName}}());
+                        __result;
+                        """;
                     string moduleResult = engine.Evaluate(
                         new DocumentInfo { Category = ModuleCategory.Standard },
                         moduleScript
