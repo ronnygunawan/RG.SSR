@@ -14,7 +14,11 @@ namespace RG.SSR.React
         private static readonly object _reactScriptLock = new();
         private static string? _reactSsrScript;
         private static readonly object _reactSsrScriptLock = new();
+        private static bool _ssrModuleRegistered;
+        private static readonly object _ssrModuleRegisteredLock = new();
         private static readonly ConcurrentDictionary<string, string> _componentCache = new();
+
+        private const string SsrModuleSpecifier = "react-ssr";
 
         private static readonly JsonSerializerOptions _propsSerializerOptions = new()
         {
@@ -22,15 +26,18 @@ namespace RG.SSR.React
         };
 
         private readonly JavaScriptEngine _javaScriptEngine;
+        private readonly ModuleLoader _moduleLoader;
         private readonly IOptions<ServerSideRendererOptions> _optionsAccessor;
         private bool _reactScriptRendered;
 
         public ReactRenderer(
             JavaScriptEngine javaScriptEngine,
+            ModuleLoader moduleLoader,
             IOptions<ServerSideRendererOptions> optionsAccessor
         )
         {
             _javaScriptEngine = javaScriptEngine;
+            _moduleLoader = moduleLoader;
             _optionsAccessor = optionsAccessor;
         }
 
@@ -78,7 +85,9 @@ namespace RG.SSR.React
                 {
                     if (_reactSsrScript == null)
                     {
-                        using Stream stream = Assembly.GetExecutingAssembly().GetManifestResourceStream("RG.SSR.React.Scripts.ReactSSR.js") ?? throw new InvalidProgramException("Could not find the ReactSSR.js script.");
+                        var assembly = Assembly.GetExecutingAssembly();
+                        using Stream stream = assembly.GetManifestResourceStream("RG.SSR.React.Scripts.ReactSSR.js")
+                            ?? throw new InvalidOperationException($"Could not find embedded resource 'RG.SSR.React.Scripts.ReactSSR.js' in assembly '{assembly.FullName}'.");
                         using StreamReader reader = new(stream);
                         _reactSsrScript = reader.ReadToEnd();
                     }
@@ -86,6 +95,24 @@ namespace RG.SSR.React
             }
 
             return _reactSsrScript;
+        }
+
+        private void EnsureSsrModuleRegistered()
+        {
+            if (!_ssrModuleRegistered)
+            {
+                lock (_ssrModuleRegisteredLock)
+                {
+                    if (!_ssrModuleRegistered)
+                    {
+                        string ssrScript = GetSsrScript();
+                        // Convert the SSR script to an ES module that exports the render function
+                        string ssrModuleSource = ssrScript + "\nexport { render };";
+                        _moduleLoader.RegisterModule(SsrModuleSpecifier, ssrModuleSource);
+                        _ssrModuleRegistered = true;
+                    }
+                }
+            }
         }
 
         public string Render(Assembly componentAssembly, string componentName, bool isStatic)
@@ -104,6 +131,14 @@ namespace RG.SSR.React
                     return reader.ReadToEnd();
                 });
 
+            bool isModule = ModuleSyntaxDetector.ContainsModuleSyntax(componentScript);
+
+            if (isModule)
+            {
+                return RenderModule(componentAssembly, componentName, componentScript, propsJson: null, isStatic);
+            }
+
+            // Plain script evaluation (unchanged behavior)
             string ssrScript = GetSsrScript();
 
             string renderScript = $"""
@@ -126,7 +161,7 @@ namespace RG.SSR.React
             if (_optionsAccessor.Value.React.InlineLibrary && !_reactScriptRendered)
             {
                 _reactScriptRendered = true;
-                
+
                 return $"""
                     <script defer>{GetReactScript(componentAssembly)}</script>
                     <div id="{id}">{renderedComponent}</div>
@@ -164,9 +199,17 @@ namespace RG.SSR.React
                     return reader.ReadToEnd();
                 });
 
-            string ssrScript = GetSsrScript();
-
             string propsJson = JsonSerializer.Serialize(props, _propsSerializerOptions);
+
+            bool isModule = ModuleSyntaxDetector.ContainsModuleSyntax(componentScript);
+
+            if (isModule)
+            {
+                return RenderModule(componentAssembly, componentName, componentScript, propsJson, isStatic);
+            }
+
+            // Plain script evaluation (unchanged behavior)
+            string ssrScript = GetSsrScript();
 
             string renderScript = $"""
                 {ssrScript}
@@ -206,6 +249,66 @@ namespace RG.SSR.React
                     <script defer>
                     {componentScript}
                     ReactDOM.hydrate(React.createElement({componentName}, {propsJson}), document.getElementById("{id}"));
+                    </script>
+                    """;
+            }
+        }
+
+        private string RenderModule(Assembly componentAssembly, string componentName, string componentScript, string? propsJson, bool isStatic)
+        {
+            EnsureSsrModuleRegistered();
+
+            // Register the component script as a module so the wrapper can import it
+            string componentModuleSpecifier = $"./{componentName}.js";
+
+            // Construct a wrapper module that imports the SSR render function and the component,
+            // then invokes the component and renders it.
+            // Try default export first, fall back to named export matching componentName.
+            string propsArg = propsJson ?? "undefined";
+            string wrapperModule = $$"""
+                import { render } from '{{SsrModuleSpecifier}}';
+                import ComponentDefault, * as ComponentNamed from '{{componentModuleSpecifier}}';
+                const Component = ComponentDefault || ComponentNamed['{{componentName}}'];
+                if (!Component) {
+                    throw new Error('No valid component export was found for "{{componentName}}". The module must have a default export or a named export matching "{{componentName}}".');
+                }
+                const props = {{propsArg}};
+                const vdom = props !== undefined ? Component(props) : Component();
+                const result = render(vdom);
+                result;
+                """;
+
+            string renderedComponent = _javaScriptEngine.RenderModule(wrapperModule, componentAssembly);
+
+            if (isStatic)
+            {
+                return renderedComponent;
+            }
+
+            string id = "react-" + Guid.NewGuid().ToString()[..8];
+
+            if (_optionsAccessor.Value.React.InlineLibrary && !_reactScriptRendered)
+            {
+                _reactScriptRendered = true;
+
+                string hydrationProps = propsJson ?? "null";
+                return $"""
+                    <script defer>{GetReactScript(componentAssembly)}</script>
+                    <div id="{id}">{renderedComponent}</div>
+                    <script type="module">
+                    import Component from '{componentModuleSpecifier}';
+                    ReactDOM.hydrate(React.createElement(Component, {hydrationProps}), document.getElementById("{id}"));
+                    </script>
+                    """;
+            }
+            else
+            {
+                string hydrationProps = propsJson ?? "null";
+                return $"""
+                    <div id="{id}">{renderedComponent}</div>
+                    <script type="module">
+                    import Component from '{componentModuleSpecifier}';
+                    ReactDOM.hydrate(React.createElement(Component, {hydrationProps}), document.getElementById("{id}"));
                     </script>
                     """;
             }

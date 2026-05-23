@@ -1,6 +1,7 @@
 ﻿using Microsoft.ClearScript;
 using Microsoft.ClearScript.JavaScript;
 using Microsoft.ClearScript.V8;
+using System.Reflection;
 
 namespace RG.SSR.JavaScript
 {
@@ -63,6 +64,32 @@ namespace RG.SSR.JavaScript
             }
 
             return result;
+        }
+
+        public string RenderModule(string moduleCode, Assembly componentAssembly)
+        {
+            V8ScriptEngine scriptEngine = GetScriptEngine();
+
+            _moduleLoader.SetComponentAssembly(componentAssembly);
+            try
+            {
+                if (scriptEngine.Evaluate(
+                    documentInfo: new DocumentInfo
+                    {
+                        Category = ModuleCategory.Standard
+                    },
+                    code: moduleCode
+                ) is not string result)
+                {
+                    throw new InvalidOperationException("The script did not return a string.");
+                }
+
+                return result;
+            }
+            finally
+            {
+                _moduleLoader.ClearComponentAssembly();
+            }
         }
 
         private void Dispose(bool disposing)
