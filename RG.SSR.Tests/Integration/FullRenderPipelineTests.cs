@@ -14,6 +14,7 @@ namespace RG.SSR.Tests.Integration;
 /// Integration tests for the full render pipeline.
 /// Validates Requirements 4.2, 6.2, 6.3, 6.4.
 /// </summary>
+[Collection("Sequential")]
 public class FullRenderPipelineTests
 {
     /// <summary>
@@ -64,6 +65,7 @@ public class FullRenderPipelineTests
 
     private static (ReactRenderer renderer, ModuleLoader moduleLoader, JavaScriptEngine engine) CreateReactRenderer()
     {
+        ResetReactSsrModuleRegistered();
         var moduleLoader = new ModuleLoader();
         var engine = new JavaScriptEngine(moduleLoader);
         var ssrOptions = new ServerSideRendererOptions();

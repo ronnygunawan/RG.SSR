@@ -142,6 +142,7 @@ public class HydrationOutputProperties
     /// </summary>
     private static (ReactRenderer renderer, JavaScriptEngine engine) CreateReactRenderer()
     {
+        ResetReactSsrModuleRegistered();
         var moduleLoader = new ModuleLoader();
         var engine = new JavaScriptEngine(moduleLoader);
         var ssrOptions = new ServerSideRendererOptions();
