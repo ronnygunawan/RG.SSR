@@ -117,7 +117,7 @@ This plan implements ES module support for RG.SSR by enhancing the `ModuleLoader
     - For components with module syntax rendered with `isStatic=false`, verify output contains `<script type="module">`
     - For components without module syntax rendered with `isStatic=false`, verify output contains `<script defer>`
 
-  - [ ] 4.6 Write property test for static rendering (Property 8: Static Rendering Produces No Scripts)
+  - [x] 4.6 Write property test for static rendering (Property 8: Static Rendering Produces No Scripts)
     - **Property 8: Static Rendering Produces No Scripts**
     - **Validates: Requirements 7.4**
     - For any component rendered with `isStatic=true`, verify output contains no `<script` tags and no container `<div>` wrapper

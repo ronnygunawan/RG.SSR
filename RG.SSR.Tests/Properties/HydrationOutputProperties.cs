@@ -295,4 +295,141 @@ public class HydrationOutputProperties
                 }
             });
     }
+
+    // ===== Property 8: Static Rendering Produces No Scripts =====
+    // Feature: es-module-support, Property 8: Static Rendering Produces No Scripts
+    /// <summary>
+    /// For any component (whether ES module or plain script) rendered with isStatic=true,
+    /// the output SHALL contain no &lt;script tags and no container &lt;div&gt; wrapper —
+    /// only the server-rendered HTML content.
+    /// </summary>
+    /// **Validates: Requirements 7.4**
+
+    /// <summary>
+    /// Property 8a: For React ES module components rendered with isStatic=true,
+    /// the output contains no &lt;script tags and no container div wrapper.
+    /// </summary>
+    [Property(MaxTest = 100)]
+    public Property React_ModuleComponent_Static_ProducesNoScripts()
+    {
+        return Prop.ForAll(
+            ComponentNameArbitrary(),
+            TagNameArbitrary(),
+            TextContentArbitrary(),
+            (string componentName, string tag, string text) =>
+            {
+                var assembly = CreateReactEsModuleAssembly(componentName, tag, text);
+                var (renderer, engine) = CreateReactRenderer();
+                using (engine)
+                {
+                    string output = renderer.Render(assembly, componentName, isStatic: true);
+
+                    var noScriptTag = !output.Contains("<script", StringComparison.OrdinalIgnoreCase);
+                    var noContainerDiv = !output.Contains("<div id=\"react-");
+
+                    return (noScriptTag && noContainerDiv)
+                        .Label($"React module component with isStatic=true should produce no scripts and no container div. " +
+                               $"ComponentName='{componentName}', " +
+                               $"NoScriptTag={noScriptTag}, " +
+                               $"NoContainerDiv={noContainerDiv}, " +
+                               $"Output='{output[..Math.Min(output.Length, 300)]}'");
+                }
+            });
+    }
+
+    /// <summary>
+    /// Property 8b: For React plain script components rendered with isStatic=true,
+    /// the output contains no &lt;script tags and no container div wrapper.
+    /// </summary>
+    [Property(MaxTest = 100)]
+    public Property React_PlainScriptComponent_Static_ProducesNoScripts()
+    {
+        return Prop.ForAll(
+            ComponentNameArbitrary(),
+            TagNameArbitrary(),
+            TextContentArbitrary(),
+            (string componentName, string tag, string text) =>
+            {
+                var assembly = CreatePlainScriptAssembly(componentName, tag, text);
+                var (renderer, engine) = CreateReactRenderer();
+                using (engine)
+                {
+                    string output = renderer.Render(assembly, componentName, isStatic: true);
+
+                    var noScriptTag = !output.Contains("<script", StringComparison.OrdinalIgnoreCase);
+                    var noContainerDiv = !output.Contains("<div id=\"react-");
+
+                    return (noScriptTag && noContainerDiv)
+                        .Label($"React plain script component with isStatic=true should produce no scripts and no container div. " +
+                               $"ComponentName='{componentName}', " +
+                               $"NoScriptTag={noScriptTag}, " +
+                               $"NoContainerDiv={noContainerDiv}, " +
+                               $"Output='{output[..Math.Min(output.Length, 300)]}'");
+                }
+            });
+    }
+
+    /// <summary>
+    /// Property 8c: For Preact ES module components rendered with isStatic=true,
+    /// the output contains no &lt;script tags and no container div wrapper.
+    /// </summary>
+    [Property(MaxTest = 100)]
+    public Property Preact_ModuleComponent_Static_ProducesNoScripts()
+    {
+        return Prop.ForAll(
+            ComponentNameArbitrary(),
+            TagNameArbitrary(),
+            TextContentArbitrary(),
+            (string componentName, string tag, string text) =>
+            {
+                var assembly = CreatePreactEsModuleAssembly(componentName, tag, text);
+                var (renderer, engine) = CreatePreactRenderer();
+                using (engine)
+                {
+                    string output = renderer.Render(assembly, componentName, isStatic: true);
+
+                    var noScriptTag = !output.Contains("<script", StringComparison.OrdinalIgnoreCase);
+                    var noContainerDiv = !output.Contains("<div id=\"preact-");
+
+                    return (noScriptTag && noContainerDiv)
+                        .Label($"Preact module component with isStatic=true should produce no scripts and no container div. " +
+                               $"ComponentName='{componentName}', " +
+                               $"NoScriptTag={noScriptTag}, " +
+                               $"NoContainerDiv={noContainerDiv}, " +
+                               $"Output='{output[..Math.Min(output.Length, 300)]}'");
+                }
+            });
+    }
+
+    /// <summary>
+    /// Property 8d: For Preact plain script components rendered with isStatic=true,
+    /// the output contains no &lt;script tags and no container div wrapper.
+    /// </summary>
+    [Property(MaxTest = 100)]
+    public Property Preact_PlainScriptComponent_Static_ProducesNoScripts()
+    {
+        return Prop.ForAll(
+            ComponentNameArbitrary(),
+            TagNameArbitrary(),
+            TextContentArbitrary(),
+            (string componentName, string tag, string text) =>
+            {
+                var assembly = CreatePlainScriptAssembly(componentName, tag, text);
+                var (renderer, engine) = CreatePreactRenderer();
+                using (engine)
+                {
+                    string output = renderer.Render(assembly, componentName, isStatic: true);
+
+                    var noScriptTag = !output.Contains("<script", StringComparison.OrdinalIgnoreCase);
+                    var noContainerDiv = !output.Contains("<div id=\"preact-");
+
+                    return (noScriptTag && noContainerDiv)
+                        .Label($"Preact plain script component with isStatic=true should produce no scripts and no container div. " +
+                               $"ComponentName='{componentName}', " +
+                               $"NoScriptTag={noScriptTag}, " +
+                               $"NoContainerDiv={noContainerDiv}, " +
+                               $"Output='{output[..Math.Min(output.Length, 300)]}'");
+                }
+            });
+    }
 }
