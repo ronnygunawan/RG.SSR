@@ -49,8 +49,7 @@ public class FullRenderPipelineTests
         public override string FullName => _fullName;
     }
 
-    private static int _counter;
-    private static string NextUniqueId() => Interlocked.Increment(ref _counter).ToString();
+    private static string NextUniqueId() => Guid.NewGuid().ToString("N");
 
     private static (ReactRenderer renderer, ModuleLoader moduleLoader, JavaScriptEngine engine) CreateReactRenderer()
     {

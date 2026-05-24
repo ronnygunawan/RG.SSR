@@ -52,8 +52,7 @@ public class HydrationOutputProperties
         public override string FullName => _fullName;
     }
 
-    private static int _counter;
-    private static string NextUniqueId() => Interlocked.Increment(ref _counter).ToString();
+    private static string NextUniqueId() => Guid.NewGuid().ToString("N");
 
     /// <summary>
     /// Generates random component names (valid JavaScript identifiers).
