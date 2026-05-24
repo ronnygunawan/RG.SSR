@@ -70,7 +70,18 @@ app.Run();
 
 ### 2. Write a component
 
-**Plain script (global variable pattern):**
+Components can be written in plain JavaScript or **JSX**. When using JSX, add [Web Compiler 2022](https://marketplace.visualstudio.com/items?itemName=MadsKristensen.WebCompiler2022) to the project and configure it to compile `.jsx` → `.js` via `compilerconfig.json`. The compiled `.js` files are what get embedded as assembly resources.
+
+**Plain script (global variable pattern) — JSX:**
+
+```jsx
+// Views/Home/Index.jsx  →  compiled to Index.js by Web Compiler 2022
+const Index = () => {
+    return <h1>Welcome</h1>;
+};
+```
+
+**Plain script — without JSX:**
 
 ```javascript
 // Views/Home/Index.min.js
@@ -79,7 +90,19 @@ var Index = function() {
 };
 ```
 
-**ES module:**
+**ES module — JSX:**
+
+```jsx
+// Views/Home/Greeting.jsx  →  compiled to Greeting.js by Web Compiler 2022
+import { createElement } from 'react';
+import { formatGreeting } from './Shared/formatting.js';
+
+export default function Greeting({ name }) {
+    return <h1>{formatGreeting(name)}</h1>;
+}
+```
+
+**ES module — without JSX:**
 
 ```javascript
 // Views/Home/Greeting.js
