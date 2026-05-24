@@ -1,0 +1,54 @@
+@using RG.SSR
+@inject ServerSideRenderer SSR
+@{
+    ViewData["Title"] = "ES Module Demo";
+    var props = new
+    {
+        Name = "Developer",
+        Features = new[] { "ES modules", "transitive imports", "framework mocks" }
+    };
+}
+
+<div class="text-center">
+    <h1 class="display-4">ES Module Support Demo</h1>
+    <p class="lead">This page demonstrates server-side rendering with ES module components.</p>
+</div>
+
+<h3>React Component with ES Module Imports</h3>
+<p>
+    The component below is written using <code>import</code>/<code>export</code> syntax.
+    It imports <code>createElement</code> from the <code>'react'</code> framework module
+    and utility functions from a shared <code>'./Shared/formatting.js'</code> module.
+</p>
+
+@SSR.RenderReact("Greeting", props, isStatic: true)
+
+<hr class="my-4" />
+
+<h3>How It Works</h3>
+<div class="row">
+    <div class="col-md-6">
+        <h5>Component (Greeting.js)</h5>
+        <pre><code>import { createElement } from 'react';
+import { formatGreeting, formatList } from './Shared/formatting.js';
+
+export default function Greeting(props) {
+    const greeting = formatGreeting(props.name);
+    const features = formatList(props.features);
+    return createElement('div', ...);
+}</code></pre>
+    </div>
+    <div class="col-md-6">
+        <h5>Shared Module (formatting.js)</h5>
+        <pre><code>export function formatGreeting(name) {
+    return 'Hello, ' + name + '!';
+}
+
+export function formatList(items) {
+    if (items.length === 0) return 'none';
+    if (items.length === 1) return items[0];
+    return items.slice(0, -1).join(', ')
+        + ' and ' + items[items.length - 1];
+}</code></pre>
+    </div>
+</div>

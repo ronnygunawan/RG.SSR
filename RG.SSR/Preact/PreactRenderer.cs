@@ -4,7 +4,6 @@ using RG.SSR.EmbeddedResources;
 using RG.SSR.JavaScript;
 using RG.SSR.Options;
 using System.Collections.Concurrent;
-using System.Net.NetworkInformation;
 using System.Reflection;
 using System.Text.Json;
 
@@ -94,7 +93,9 @@ namespace RG.SSR.Preact
                 {
                     if (_preactSsrScript is null)
                     {
-                        using Stream stream = Assembly.GetExecutingAssembly().GetManifestResourceStream("RG.SSR.Preact.Scripts.PreactSSR.js") ?? throw new InvalidProgramException("Could not find the PreactSSR.js script.");
+                        var assembly = Assembly.GetExecutingAssembly();
+                        using Stream stream = assembly.GetManifestResourceStream("RG.SSR.Preact.Scripts.PreactSSR.js")
+                            ?? throw new InvalidOperationException($"Could not find embedded resource 'RG.SSR.Preact.Scripts.PreactSSR.js' in assembly '{assembly.FullName}'.");
                         using StreamReader reader = new(stream);
                         _preactSsrScript = reader.ReadToEnd();
                     }
@@ -120,17 +121,45 @@ namespace RG.SSR.Preact
                     return reader.ReadToEnd();
                 });
 
-            string ssrScript = GetSsrScript();
+            bool isModule = ModuleSyntaxDetector.ContainsModuleSyntax(componentScript);
 
-            string renderScript = $"""
-                {ssrScript}
-                {componentScript}
-                const vdom = {componentName}();
-                const dom = render(vdom);
-                dom;
-                """;
+            string renderedComponent;
 
-            string renderedComponent = _javaScriptEngine.Render(renderScript);
+            if (isModule)
+            {
+                string ssrScript = GetSsrScript();
+                string componentModuleSpecifier = $"./{componentName}.js";
+                string wrapperModule = $$"""
+                    import * as ComponentModule from '{{componentModuleSpecifier}}';
+                    const render = (() => {
+                        {{ssrScript}}
+                        return render;
+                    })();
+                    const Component = ComponentModule.default || ComponentModule['{{componentName}}'];
+                    if (!Component) {
+                        throw new Error('No valid component export was found for "{{componentName}}". The module must have a default export or a named export matching "{{componentName}}".');
+                    }
+                    const vdom = Component();
+                    const result = render(vdom);
+                    result;
+                    """;
+
+                renderedComponent = _javaScriptEngine.RenderModule(wrapperModule, componentAssembly);
+            }
+            else
+            {
+                string ssrScript = GetSsrScript();
+
+                string renderScript = $"""
+                    {ssrScript}
+                    {componentScript}
+                    const vdom = {componentName}();
+                    const dom = render(vdom);
+                    dom;
+                    """;
+
+                renderedComponent = _javaScriptEngine.Render(renderScript);
+            }
 
             if (isStatic)
             {
@@ -139,7 +168,29 @@ namespace RG.SSR.Preact
 
             string id = "preact-" + Guid.NewGuid().ToString()[..8];
 
-            if (_optionsAccessor.Value.React.InlineLibrary && !_preactScriptRendered)
+            if (isModule)
+            {
+                string componentModuleSpecifier = $"./{componentName}.js";
+                string hydrationPrefix = "";
+                if (_optionsAccessor.Value.Preact.InlineLibrary && !_preactScriptRendered)
+                {
+                    _preactScriptRendered = true;
+                    hydrationPrefix = $"""<script defer>{GetPreactScript(componentAssembly)}const React=preact;</script>""";
+                }
+
+                return $"""
+                    {hydrationPrefix}
+                    <div id="{id}">{renderedComponent}</div>
+                    <script type="module">
+                    import * as ComponentModule from '{componentModuleSpecifier}';
+                    const Component = ComponentModule.default || ComponentModule['{componentName}'];
+                    if (!Component) throw new Error('No valid component export was found for "{componentName}". The module must have a default export or a named export matching "{componentName}".');
+                    preact.hydrate(preact.createElement(Component, null), document.getElementById("{id}"));
+                    </script>
+                    """;
+            }
+
+            if (_optionsAccessor.Value.Preact.InlineLibrary && !_preactScriptRendered)
             {
                 _preactScriptRendered = true;
 
@@ -180,20 +231,49 @@ namespace RG.SSR.Preact
                     return reader.ReadToEnd();
                 });
 
-            string ssrScript = GetSsrScript();
+            bool isModule = ModuleSyntaxDetector.ContainsModuleSyntax(componentScript);
 
             string propsJson = JsonSerializer.Serialize(props, _propsSerializerOptions);
 
-            string renderScript = $"""
-                {ssrScript}
-                {componentScript}
-                const props = {propsJson};
-                const vdom = {componentName}(props);
-                const dom = render(vdom);
-                dom;
-                """;
+            string renderedComponent;
 
-            string renderedComponent = _javaScriptEngine.Render(renderScript);
+            if (isModule)
+            {
+                string ssrScript = GetSsrScript();
+                string componentModuleSpecifier = $"./{componentName}.js";
+                string wrapperModule = $$"""
+                    import * as ComponentModule from '{{componentModuleSpecifier}}';
+                    const render = (() => {
+                        {{ssrScript}}
+                        return render;
+                    })();
+                    const Component = ComponentModule.default || ComponentModule['{{componentName}}'];
+                    if (!Component) {
+                        throw new Error('No valid component export was found for "{{componentName}}". The module must have a default export or a named export matching "{{componentName}}".');
+                    }
+                    const props = {{propsJson}};
+                    const vdom = Component(props);
+                    const result = render(vdom);
+                    result;
+                    """;
+
+                renderedComponent = _javaScriptEngine.RenderModule(wrapperModule, componentAssembly);
+            }
+            else
+            {
+                string ssrScript = GetSsrScript();
+
+                string renderScript = $"""
+                    {ssrScript}
+                    {componentScript}
+                    const props = {propsJson};
+                    const vdom = {componentName}(props);
+                    const dom = render(vdom);
+                    dom;
+                    """;
+
+                renderedComponent = _javaScriptEngine.Render(renderScript);
+            }
 
             if (isStatic)
             {
@@ -202,7 +282,29 @@ namespace RG.SSR.Preact
 
             string id = "preact-" + Guid.NewGuid().ToString()[..8];
 
-            if (_optionsAccessor.Value.React.InlineLibrary && !_preactScriptRendered)
+            if (isModule)
+            {
+                string componentModuleSpecifier = $"./{componentName}.js";
+                string hydrationPrefix = "";
+                if (_optionsAccessor.Value.Preact.InlineLibrary && !_preactScriptRendered)
+                {
+                    _preactScriptRendered = true;
+                    hydrationPrefix = $"""<script defer>{GetPreactScript(componentAssembly)}const React=preact;</script>""";
+                }
+
+                return $"""
+                    {hydrationPrefix}
+                    <div id="{id}">{renderedComponent}</div>
+                    <script type="module">
+                    import * as ComponentModule from '{componentModuleSpecifier}';
+                    const Component = ComponentModule.default || ComponentModule['{componentName}'];
+                    if (!Component) throw new Error('No valid component export was found for "{componentName}". The module must have a default export or a named export matching "{componentName}".');
+                    preact.hydrate(preact.createElement(Component, propsJson), document.getElementById("{id}"));
+                    </script>
+                    """;
+            }
+
+            if (_optionsAccessor.Value.Preact.InlineLibrary && !_preactScriptRendered)
             {
                 _preactScriptRendered = true;
 

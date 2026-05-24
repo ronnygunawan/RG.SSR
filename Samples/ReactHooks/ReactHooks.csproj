@@ -1,7 +1,7 @@
 <Project Sdk="Microsoft.NET.Sdk.Web">
 
 	<PropertyGroup>
-		<TargetFramework>net7.0</TargetFramework>
+		<TargetFramework>net10.0</TargetFramework>
 		<Nullable>enable</Nullable>
 		<ImplicitUsings>enable</ImplicitUsings>
 		<UserSecretsId>c8420d54-dc75-45c1-8570-5b10a757f352</UserSecretsId>
@@ -11,6 +11,8 @@
 	<ItemGroup>
 		<None Include="compilerconfig.json" />
 		<EmbeddedResource Include="Views/**/*.min.js" />
+		<EmbeddedResource Include="Views/**/Greeting.js" />
+		<EmbeddedResource Include="Views/**/Shared/*.js" />
 		<EmbeddedResource Include="wwwroot/lib/**/*.min.js" />
 	</ItemGroup>
 
