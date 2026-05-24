@@ -140,7 +140,11 @@ export default function Greeting(props) {
 @SSR.RenderReact("Counter")
 
 @* With props *@
-@SSR.RenderReact("Greeting", new { Name = "World" }, isStatic: true)
+@SSR.RenderReact(
+    componentName: "Greeting",
+    props: new { Name = "World" },
+    isStatic: true
+)
 ```
 
 For Preact, use `SSR.RenderPreact(...)` with the same signature.
