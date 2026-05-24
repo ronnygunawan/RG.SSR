@@ -255,8 +255,8 @@ namespace RG.SSR.React
             string propsArg = propsJson ?? "undefined";
             string wrapperModule = $$"""
                 import { render } from '{{SsrModuleSpecifier}}';
-                import ComponentDefault, * as ComponentNamed from '{{componentModuleSpecifier}}';
-                const Component = ComponentDefault || ComponentNamed['{{componentName}}'];
+                import * as ComponentModule from '{{componentModuleSpecifier}}';
+                const Component = ComponentModule.default || ComponentModule['{{componentName}}'];
                 if (!Component) {
                     throw new Error('No valid component export was found for "{{componentName}}". The module must have a default export or a named export matching "{{componentName}}".');
                 }
@@ -284,7 +284,8 @@ namespace RG.SSR.React
                     <script defer>{GetReactScript(componentAssembly)}</script>
                     <div id="{id}">{renderedComponent}</div>
                     <script type="module">
-                    import Component from '{componentModuleSpecifier}';
+                    import * as ComponentModule from '{componentModuleSpecifier}';
+                    const Component = ComponentModule.default || ComponentModule['{componentName}'];
                     ReactDOM.hydrate(React.createElement(Component, {hydrationProps}), document.getElementById("{id}"));
                     </script>
                     """;
@@ -295,7 +296,8 @@ namespace RG.SSR.React
                 return $"""
                     <div id="{id}">{renderedComponent}</div>
                     <script type="module">
-                    import Component from '{componentModuleSpecifier}';
+                    import * as ComponentModule from '{componentModuleSpecifier}';
+                    const Component = ComponentModule.default || ComponentModule['{componentName}'];
                     ReactDOM.hydrate(React.createElement(Component, {hydrationProps}), document.getElementById("{id}"));
                     </script>
                     """;
