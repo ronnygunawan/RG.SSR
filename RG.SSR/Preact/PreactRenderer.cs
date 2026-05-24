@@ -299,7 +299,7 @@ namespace RG.SSR.Preact
                     import * as ComponentModule from '{componentModuleSpecifier}';
                     const Component = ComponentModule.default || ComponentModule['{componentName}'];
                     if (!Component) throw new Error('No valid component export was found for "{componentName}". The module must have a default export or a named export matching "{componentName}".');
-                    preact.hydrate(preact.createElement(Component, {propsJson}), document.getElementById("{id}"));
+                    preact.hydrate(preact.createElement(Component, propsJson), document.getElementById("{id}"));
                     </script>
                     """;
             }
